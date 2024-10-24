@@ -1,0 +1,40 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["dist/**"]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "dist/index.js"
+    }
+  ],
+  "env": {
+    "DB_NAME": "database",
+    "DB_USERNAME": "letung1227",
+    "DB_PASSWORD": "cOhc9nWMbtGbZtMB",
+    "PORT": "4000",
+    "KEY_SESSION_COOKIE": "tung3k4234lksjdf",
+    "CLOUD_NAME": "dooyip2jn",
+    "API_KEY": "336513891227453",
+    "API_SECRET": "LV3634SRT1KoEDNC3awYUi9u7k4"
+  },
+  "build": {
+    "env": {
+      "DB_NAME": "database",
+      "DB_USERNAME": "letung1227",
+      "DB_PASSWORD": "cOhc9nWMbtGbZtMB",
+      "PORT": "4000",
+      "KEY_SESSION_COOKIE": "tung3k4234lksjdf",
+      "CLOUD_NAME": "dooyip2jn",
+      "API_KEY": "336513891227453",
+      "API_SECRET": "LV3634SRT1KoEDNC3awYUi9u7k4"
+    }
+  }
+}
