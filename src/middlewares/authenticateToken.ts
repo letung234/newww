@@ -2,11 +2,9 @@ import { Request, Response, NextFunction } from 'express'
 import { config } from 'dotenv'
 import { ObjectId } from 'mongodb'
 import { verifyToken } from '~/utils/jwt'
-import RefreshToken from '~/models/schemas/refreshtoken.model'
 import databaseService from '~/services/database.service'
 import { MESSAGES } from '~/constants/messages'
 import usersService from '~/services/users.service'
-import { ErrorWithStatus } from '~/models/Errors'
 import HTTP_STATUS from '~/constants/httpStatus'
 
 config()

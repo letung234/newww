@@ -1048,7 +1048,6 @@ Validator.isPassword = function (selector) {
   }
 }
 
-
 Validator.isNumber = function (selector, message = 'Giá trị phải là một số hợp lệ') {
   return {
     selector: selector,

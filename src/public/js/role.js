@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { toast, Validator, confirmButton } from './main.js'
+import { toast, Validator, confirmButton, updateErrorMessages } from './main.js'
 document.addEventListener('DOMContentLoaded', async function () {
   const formCreate = document.querySelector('#create_role')
   if (formCreate) {
