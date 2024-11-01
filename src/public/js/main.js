@@ -233,7 +233,6 @@ export function toast({ title = '', message = '', type = 'info', duration = 3000
 // Hàm hiển thị các số trang
 export function displayPagination(object, api, currentPage, totalPages) {
   const pagination = document.getElementById('pagination')
-  console.log(pagination)
   const pageNumbersDiv = document.getElementById('pageNumbers')
   pagination.innerHTML = ''
   pageNumbersDiv.innerHTML = ''
@@ -404,7 +403,6 @@ export async function Filter(object, api, currentPage) {
       fieldSelect.appendChild(opt)
       if (field == 0) {
         const { operators, selections } = fieldOptions[field]
-        console.log(fieldOptions[field])
 
         // Xóa options cũ và cập nhật operator
         operatorSelect.innerHTML = ''
@@ -457,7 +455,7 @@ export async function Filter(object, api, currentPage) {
       const selected = fieldOptions.find((field) => {
         return field.name === this.value
       })
-      console.log(selected)
+
       const selectedField = fieldSelect.value
       const { operators, selections, name } = selected
 
@@ -482,7 +480,7 @@ export async function Filter(object, api, currentPage) {
           valueSelect.appendChild(opt)
         })
       } else {
-        if (name == 'ngay_tao') {
+        if (name == 'ngay_tao' || name == 'updated_at') {
           valueInput.type = 'text'
           flatpickr(valueInput, {
             dateFormat: 'Y-m-d', // Định dạng ngày
@@ -554,7 +552,7 @@ export async function Filter(object, api, currentPage) {
   }
 }
 
-export function filterSelect(object, api) {
+export function filterSelect(object, api, currentPage) {
   const filterDiv = document.getElementById('toggleincrease_or_decrease')
   const filterSelect = document.getElementById('filterSelect')
   if (filterDiv && filterSelect) {
@@ -596,7 +594,7 @@ export function filterSelect(object, api) {
         </svg>`
       }
       filterDiv.querySelector('svg').addEventListener('click', async function () {
-        await handlefilter(object, api)()
+        await handlefilter(object, api, currentPage)()
       })
     })
   }
@@ -660,8 +658,6 @@ export async function handlefilter(object, Api, currentPage) {
 
   data.pages = currentPage
 
-  console.log(data)
-
   // Gọi API
   await Api(data)
 }
@@ -716,26 +712,31 @@ export function checkboxMulti(object, api, deleteLink, createLink, currentPage) 
   if (checkboxMulti) {
     const inputCheckAll = checkboxMulti.querySelector("input[name='checkall']")
     const inputsID = checkboxMulti.querySelectorAll("input[name='id']")
-    // Kiểm tra tất cả các checkbox khi 'Check All' được click
-    inputCheckAll.addEventListener('click', () => {
-      const inputsID = checkboxMulti.querySelectorAll("input[name='id']")
-      const isChecked = inputCheckAll.checked
-      inputsID.forEach((input) => {
-        input.checked = isChecked
-      })
-      // Cập nhật hành động sau khi thay đổi check all
-      updateAction(object, api, deleteLink, createLink, handlefilter, currentPage)
-    })
-
-    // Khi một trong các checkbox thay đổi, cập nhật lại trạng thái của check all
-    inputsID.forEach((input) => {
-      input.addEventListener('click', () => {
-        const countChecked = checkboxMulti.querySelectorAll("input[name='id']:checked").length
-        inputCheckAll.checked = countChecked === inputsID.length
-        // Cập nhật hành động khi có sự thay đổi
+    if (inputCheckAll) {
+      // Kiểm tra tất cả các checkbox khi 'Check All' được click
+      inputCheckAll.addEventListener('click', () => {
+        const inputsID = checkboxMulti.querySelectorAll("input[name='id']")
+        const isChecked = inputCheckAll.checked
+        inputsID.forEach((input) => {
+          input.checked = isChecked
+        })
+        // Cập nhật hành động sau khi thay đổi check all
         updateAction(object, api, deleteLink, createLink, handlefilter, currentPage)
       })
-    })
+    }
+
+    if (inputsID) {
+      // Khi một trong các checkbox thay đổi, cập nhật lại trạng thái của check all
+      inputsID.forEach((input) => {
+        input.addEventListener('click', () => {
+          const countChecked = checkboxMulti.querySelectorAll("input[name='id']:checked").length
+          inputCheckAll.checked = countChecked === inputsID.length
+          // Cập nhật hành động khi có sự thay đổi
+          updateAction(object, api, deleteLink, createLink, handlefilter, currentPage)
+        })
+      })
+    }
+
     // Cập nhật hành động lần đầu tiên khi trang load
     if (checkboxMulti) {
       updateAction(object, api, deleteLink, createLink, handlefilter, currentPage)
@@ -807,15 +808,37 @@ export function updateAction(object, api, deleteLink, createLink, handlefilter, 
               title: 'Xóa Thành Công!!',
               message: result.message
             })
-            console.log('type', typeof handlefilter)
+
             if (typeof handlefilter == 'function') {
               await handlefilter(object, api, currentPage)
               const inputCheckAll = (checkboxMulti.querySelector("input[name='checkall']").checked = false)
             } else {
               console.error('handlefilter không phải là một hàm')
             }
+            deleteBtn.remove()
+            const createBtn = document.createElement('div')
+            createBtn.classList.add(
+              'text-white',
+              'bg-blue-500',
+              'hover:bg-blue-600',
+              'rounded-sm',
+              'w-36',
+              'text-xs',
+              'h-6',
+              'flex',
+              'justify-center',
+              'items-center',
+              'cursor-pointer'
+            )
+            createBtn.innerHTML = 'Thêm Phân Lương'
+
+            // Thêm sự kiện click để chuyển đến trang thêm mới
+            createBtn.addEventListener('click', function () {
+              // Chuyển hướng đến trang thêm mới
+              window.location.href = createLink
+            })
+            action.appendChild(createBtn)
           } else {
-            console.log(result)
             toast({
               type: 'error',
               title: 'Xóa Thất Bại!!',
@@ -858,13 +881,9 @@ export function updateAction(object, api, deleteLink, createLink, handlefilter, 
     action.appendChild(createBtn)
   }
 }
-// Kiểm tra async function
-const isAsyncFunction = (func) => func.constructor.name === 'AsyncFunction'
 
 // Đối tượng `Validator`
-export async function Validator(options) {
-  console.log(options)
-
+export function Validator(options) {
   function getParent(element, selector) {
     while (element.parentElement) {
       if (element.parentElement.matches(selector)) {
@@ -877,8 +896,10 @@ export async function Validator(options) {
   var selectorRules = {}
 
   // Hàm thực hiện validate
-  async function validate(inputElement, rule) {
+  function validate(inputElement, rule) {
+    console.log(rule)
     var errorElement = getParent(inputElement, options.formGroupSelector).querySelector(options.errorSelector)
+
     var errorMessage
 
     // Lấy ra các rules của selector
@@ -889,22 +910,14 @@ export async function Validator(options) {
       switch (inputElement.type) {
         case 'radio':
         case 'checkbox':
-          if (isAsyncFunction(rules[i])) {
-            errorMessage = await rules[i](formElement.querySelector(rule.selector + ':checked'))
-          } else {
-            errorMessage = rules[i](formElement.querySelector(rule.selector + ':checked'))
-          }
+          errorMessage = rules[i](formElement.querySelector(rule.selector + ':checked'))
           break
         default:
-          if (isAsyncFunction(rules[i])) {
-            errorMessage = await rules[i](inputElement.value)
-          } else {
-            errorMessage = rules[i](inputElement.value)
-          }
-
-          if (errorMessage) break
+          errorMessage = rules[i](inputElement.value)
       }
+      if (errorMessage) break
     }
+
     if (errorMessage) {
       errorElement.innerText = errorMessage
       getParent(inputElement, options.formGroupSelector).classList.add('invalid')
@@ -921,18 +934,17 @@ export async function Validator(options) {
   if (formElement) {
     formElement.addEventListener('submit', async function (e) {
       e.preventDefault()
-      console.log(options.rules)
 
       var isFormValid = true
 
-      options.rules.forEach(async function (rule) {
+      for (var i = 0; i < options.rules.length; i++) {
+        var rule = options.rules[i]
         var inputElement = formElement.querySelector(rule.selector)
-        var isValid = await validate(inputElement, rule)
+        var isValid = validate(inputElement, rule)
         if (!isValid) {
           isFormValid = false
         }
-      })
-
+      }
       if (isFormValid) {
         // Trường hợp submit với javascript
         if (typeof options.onSubmit === 'function') {
@@ -954,6 +966,9 @@ export async function Validator(options) {
                 break
               case 'file':
                 values[input.name] = input.files
+                break
+              case 'textarea':
+                values[input.name] = tinymce.get(input.id).getContent()
                 break
               default:
                 values[input.name] = input.value
@@ -1003,66 +1018,42 @@ Validator.isRequired = function (selector, message) {
     }
   }
 }
-
-// Kiểm tra sự tồn tại của tên phân lương qua API
-Validator.salaryNameIsExists = function (selector, message) {
+Validator.isPassword = function (selector) {
   return {
     selector: selector,
-    test: async function (value) {
-      try {
-        const response = await fetch('/api/validates/salary/salarynameisexists', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            ten: value.trim()
-          })
-        })
-
-        const data = await response.json()
-
-        if (response.status === 409) {
-          return message || data.message
-        }
-
-        return undefined
-      } catch (error) {
-        console.error('Lỗi khi gọi API kiểm tra tên phân lương:', error)
-        return 'Chưa thể xác thực sự tồn tại của phần lương, vui lòng thử lại'
+    test: function (value) {
+      if (!value) {
+        return 'Vui lòng nhập mật khẩu'
       }
+
+      if (typeof value !== 'string') {
+        return 'Mật khẩu phải là một chuỗi'
+      }
+
+      if (value.length < 6 || value.length > 50) {
+        return 'Mật khẩu phải từ 6 đến 50 ký tự'
+      }
+
+      const hasLowercase = /[a-z]/.test(value)
+      const hasUppercase = /[A-Z]/.test(value)
+      const hasNumber = /[0-9]/.test(value)
+      const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(value)
+
+      if (!hasLowercase || !hasUppercase || !hasNumber || !hasSymbol) {
+        return 'Mật khẩu phải chứa ít nhất một chữ cái thường, một chữ hoa, một số, và một ký tự đặc biệt'
+      }
+
+      return undefined
     }
   }
 }
-Validator.EditSalaryNameIsExists = function (selector, message) {
+
+
+Validator.isNumber = function (selector, message = 'Giá trị phải là một số hợp lệ') {
   return {
     selector: selector,
-    test: async function (value) {
-      try {
-        const url = window.location.pathname
-        const segments = url.split('/')
-        const salaryId = segments[segments.length - 1]
-        const response = await fetch(`/api/validates/salary/salaryeditnameisexists/${salaryId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            ten: value.trim()
-          })
-        })
-
-        const data = await response.json()
-
-        if (response.status === 409) {
-          return message || data.message
-        }
-
-        return undefined
-      } catch (error) {
-        console.error('Lỗi khi gọi API kiểm tra tên phân lương:', error)
-        return 'Chưa thể xác thực sự tồn tại của phần lương, vui lòng thử lại'
-      }
+    test: function (value) {
+      return !isNaN(value) ? undefined : message
     }
   }
 }
@@ -1124,4 +1115,178 @@ export function tbody(link) {
       }
     })
   }
+}
+export function insertRow(tableId, selectId1, selectId2, addRowButton, editRowIndex) {
+  const addRowBtn = document.getElementById(addRowButton)
+  if (addRowBtn) {
+    addRowBtn.addEventListener('click', function () {
+      // Lấy giá trị từ các trường input
+      const selectElement1 = document.getElementById(selectId1)
+      const selectElement2 = document.getElementById(selectId2)
+
+      // Lấy ID và tên mục từ select hoặc input
+      const itemId1 = selectElement1.value // Lấy giá trị từ select hoặc input
+      const itemId2 = selectElement2.value // Lấy giá trị từ select hoặc input
+
+      // Kiểm tra xem selectElement có phải là select hay không để lấy tên mục
+      let itemName1, itemName2
+      if (selectElement1.tagName === 'SELECT') {
+        itemName1 = selectElement1.options[selectElement1.selectedIndex].text // Lấy tên mục nếu là select
+      } else {
+        itemName1 = selectElement1.value // Lấy giá trị nếu là input
+      }
+
+      if (selectElement2.tagName === 'SELECT') {
+        itemName2 = selectElement2.options[selectElement2.selectedIndex].text // Lấy tên mục nếu là select
+      } else {
+        itemName2 = selectElement2.value // Lấy giá trị nếu là input
+      }
+
+      // Kiểm tra nếu các trường không rỗng
+      if (itemId1 && itemId2) {
+        const table = document.getElementById(tableId).getElementsByTagName('tbody')[0]
+
+        // Nếu đang sửa, cập nhật hàng
+        if (editRowIndex >= 0) {
+          const row = table.rows[editRowIndex]
+          row.cells[1].textContent = itemName1 // Cập nhật mục 1
+          row.cells[2].textContent = itemName2 // Cập nhật mục 2
+          row.cells[1].setAttribute('data-id', itemId1) // Cập nhật ID mục 1
+          row.cells[2].setAttribute('data-id', itemId2) // Cập nhật ID mục 2
+          document.getElementById(addRowButton).textContent = 'Thêm Hàng' // Đặt lại văn bản nút
+          editRowIndex = -1 // Đặt lại chỉ số sửa
+        } else {
+          // Tạo một hàng mới cho bảng
+          const newRow = table.insertRow()
+
+          // Thêm các ô vào hàng mới
+          const cell1 = newRow.insertCell(0)
+          const cell2 = newRow.insertCell(1)
+          const cell3 = newRow.insertCell(2)
+          const cell4 = newRow.insertCell(3) // Ô cho nút xóa
+          // add class
+          cell1.classList.add('border-b', 'border-gray-300', 'px-4', 'py-2')
+          cell2.classList.add('border-b', 'border-gray-300', 'px-4', 'py-2')
+          cell3.classList.add('border-b', 'border-gray-300', 'px-4', 'py-2')
+          cell4.classList.add('border-b', 'border-gray-300', 'px-4', 'py-2')
+          // Điền dữ liệu vào các ô
+          cell1.textContent = table.rows.length // Số thứ tự tự động
+          cell2.textContent = itemName1 // Hiển thị tên mục 1
+          cell3.textContent = itemName2 // Hiển thị tên mục 2
+          cell2.setAttribute('data-id', itemId1) // Lưu ID mục 1
+          cell3.setAttribute('data-id', itemId2) // Lưu ID mục 2
+
+          // Tạo nút xóa
+          const deleteButton = document.createElement('button')
+          deleteButton.textContent = 'Xóa'
+          deleteButton.className = 'text-red-500 hover:text-red-700'
+          cell4.appendChild(deleteButton)
+        }
+
+        // Xóa giá trị trong các trường input sau khi thêm
+        selectElement1.value = ''
+        selectElement2.value = ''
+      } else {
+        toast({
+          type: 'error',
+          message: 'Vui lòng điền đầy đủ thông tin!',
+          title: 'Cảnh Báo!!!'
+        })
+      }
+    })
+  }
+
+  let accountTable = document.getElementById(tableId)
+  if (accountTable) {
+    accountTable.addEventListener('click', function (event) {
+      const target = event.target
+
+      // Kiểm tra xem người dùng có nhấp vào ô thứ 3 (chứa nút xóa) không
+      if (target.tagName === 'BUTTON' && target.closest('td').cellIndex == 3) {
+        const row = target.closest('tr') // Lấy hàng cha chứa nút bấm
+        const rowIndex = parseInt(row.cells[0].textContent) - 1 // Lấy chỉ số hàng dựa trên textContent của ô đầu tiên (cell[0])
+
+        const table = accountTable.getElementsByTagName('tbody')[0]
+        // Xóa hàng theo chỉ số
+        table.deleteRow(rowIndex)
+
+        // Cập nhật lại số thứ tự (STT) cho các hàng còn lại
+        updateRowIndices()
+      }
+    })
+  }
+
+  // Thêm sự kiện click cho các hàng trong bảng
+  accountTable = document.getElementById(tableId)
+  if (accountTable) {
+    document.getElementById(tableId).addEventListener('click', function (event) {
+      const target = event.target
+      if (target.tagName === 'TD' && target.cellIndex < 3) {
+        const row = target.closest('tr')
+
+        editRowIndex = row.rowIndex - 1 // Lưu chỉ số hàng đang sửa
+        document.getElementById(selectId1).value = row.cells[1].getAttribute('data-id') // Tải ID mục 1 vào ô nhập
+        document.getElementById(selectId2).value = row.cells[2].getAttribute('data-id') // Tải ID mục 2 vào ô nhập
+        document.getElementById(addRowButton).textContent = 'Sửa' // Thay đổi văn bản nút thành "Sửa"
+      }
+    })
+  }
+
+  // Hàm cập nhật số thứ tự
+  function updateRowIndices() {
+    const table = document.getElementById(tableId).getElementsByTagName('tbody')[0]
+    for (let i = 0; i < table.rows.length; i++) {
+      table.rows[i].cells[0].textContent = i + 1 // Cập nhật STT
+    }
+  }
+}
+
+export function getTableData(tableId) {
+  const table = document.getElementById(tableId).getElementsByTagName('tbody')[0]
+  const data = []
+
+  // Lặp qua tất cả các hàng trong bảng
+  for (let i = 0; i < table.rows.length; i++) {
+    const row = table.rows[i]
+    const rowData = {
+      itemId1: row.cells[1].getAttribute('data-id'), // Lấy ID mục 1
+      itemId2: row.cells[2].getAttribute('data-id') // Lấy ID mục 2
+    }
+
+    data.push(rowData) // Thêm dữ liệu của hàng vào mảng data
+  }
+
+  return data
+}
+
+export function updateErrorMessages(errors) {
+  console.log(errors)
+  // Lấy tất cả các key từ đối tượng lỗi
+  const keys = Object.keys(errors)
+
+  keys.forEach((key) => {
+    console.log(key)
+    // Lấy thông điệp tương ứng
+    const message = errors[key].msg
+
+    // Tìm thẻ tr có thuộc tính name tương ứng
+    const input = document.querySelector(`[name="${key}"]`)
+    const row = input.closest('div')
+    console.log(row)
+
+    if (row) {
+      // Tìm thẻ span có lớp form-message trong thẻ tr đó
+      const messageSpan = row.querySelector('span.form-message')
+      console.log(messageSpan)
+      if (messageSpan) {
+        // Cập nhật giá trị của span với thông điệp
+        messageSpan.textContent = message
+
+        // Thêm lớp 'invalid' nếu chưa có
+        if (!messageSpan.closest('div').classList.contains('invalid')) {
+          messageSpan.closest('div').classList.add('invalid')
+        }
+      }
+    }
+  })
 }

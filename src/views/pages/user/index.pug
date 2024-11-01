@@ -1,0 +1,60 @@
+extends ../../layouts/default.pug
+
+block main
+  if role.permission.includes("accounts_view")
+    .container.mx-auto.px-4
+      h1(class="text-2xl font-semibold text-gray-700 my-8") Danh sách Tài Khoản
+
+      .flex.justify-between.items-center.mb-6
+        .text-gray-700.text-lg.font-medium Danh sách Tài Khoản
+        if role.permission.includes("accounts_create")
+          a(
+            href=`/users/create`
+            class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-200"
+          ) + Thêm mới
+
+      .bg-white.shadow-lg.rounded-lg.overflow-hidden
+        .p-4.border-b.border-gray-200.bg-gray-50
+          h2(class="text-lg font-semibold text-gray-600") Danh sách tài khoản
+        .overflow-x-auto
+          table(class="min-w-full bg-white text-left text-gray-600")
+            thead
+              tr
+                th(class="px-4 py-3 border-b font-semibold text-gray-500") STT
+                th(class="px-4 py-3 border-b font-semibold text-gray-500") Họ tên
+                th(class="px-4 py-3 border-b font-semibold text-gray-500") Phân quyền
+                th(class="px-4 py-3 border-b font-semibold text-gray-500") Email
+                th(class="px-4 py-3 border-b font-semibold text-gray-500") Trạng thái
+                th(class="px-4 py-3 border-b font-semibold text-gray-500") Hành động
+
+            tbody
+              h1(data=records)
+              each item, index in records
+                tr(class="hover:bg-gray-100 transition duration-200")
+                  td(class="px-4 py-3 border-b") #{index + 1}
+                  td(class="px-4 py-3 border-b") #{item.name}
+                  td(class="px-4 py-3 border-b") #{item.role.title}
+                  td(class="px-4 py-3 border-b") #{item.email}
+                  td(class="px-4 py-3 border-b")
+                    if item.is_active
+                      span(class="text-green-600 bg-green-100 px-3 py-1 rounded-full text-sm font-semibold") Hoạt động
+                    else
+                      span(class="text-red-600 bg-red-100 px-3 py-1 rounded-full text-sm font-semibold") Dừng hoạt động
+                  td(class="px-4 py-3 border-b space-x-2")
+                    if role.permission.includes("accounts_edit")
+                      a(
+                        class="bg-yellow-500 text-white px-2 py-1 rounded-md text-sm hover:bg-yellow-600 transition duration-200"
+                        href=`/users/edit/${item._id}`
+                      ) Sửa
+                    if role.permission.includes("accounts_delete")
+                      button(
+                        data-delete = item._id
+                        class="bg-red-500 text-white px-2 py-1 rounded-md text-sm hover:bg-red-600 transition duration-200"
+                      ) Xóa
+  else 
+    // Thông báo khi không có quyền truy cập
+    .container.mx-auto.p-4
+      .bg-red-100.border.border-red-400.text-red-700.p-4.rounded-md
+        p(class="font-semibold") Bạn không đủ quyền truy cập.
+block script
+  script(type="module" src="/js/users.js")

@@ -9,8 +9,8 @@ export default class Account {
   _id?: ObjectId
   ten: string
 
-  constructor(account: AccountType) {
-    this._id = account._id || new ObjectId()
-    this.ten = account.ten
+  constructor(company: AccountType) {
+    this._id = company._id || new ObjectId()
+    this.ten = company.ten
   }
 }

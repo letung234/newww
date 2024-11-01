@@ -1,8 +1,14 @@
 import { Collection, Db, MongoClient } from 'mongodb'
 import SalaryPortion from '~/models/schemas/salary.model'
-import Account from '~/models/schemas/account.model'
+import User from '~/models/schemas/user.model'
 import Company from '~/models/schemas/company.model'
 import { envConfig } from '~/constants/config'
+import Role from '~/models/schemas/role.model'
+import Account from '~/models/schemas/account.model'
+import RefreshToken from '~/models/schemas/refreshtoken.model'
+import SalaryStructure from '~/models/schemas/salaryStructure.model'
+import FormOfPayment from '~/models/schemas/form_of_payment.model'
+import PayMentAccount from '~/models/schemas/paymentAccount.model'
 const uri = `mongodb+srv://${envConfig.dbUsername}:${envConfig.dbPassword}@cluster0.ycjjawi.mongodb.net`
 
 class DatabaseService {
@@ -29,11 +35,29 @@ class DatabaseService {
   get SalaryPortion(): Collection<SalaryPortion> {
     return this.db.collection('SalaryPortion')
   }
+  get SalaryStructure(): Collection<SalaryStructure> {
+    return this.db.collection('SalaryStructure')
+  }
+  get FormOfPayment(): Collection<FormOfPayment> {
+    return this.db.collection('FormOfPayment')
+  }
+  get PayMentAccount(): Collection<PayMentAccount> {
+    return this.db.collection('PayMentAccount')
+  }
 
   get Company(): Collection<Company> {
     return this.db.collection('Company')
   }
 
+  get User(): Collection<User> {
+    return this.db.collection('User')
+  }
+  get Role(): Collection<Role> {
+    return this.db.collection('Role')
+  }
+  get refreshTokens(): Collection<RefreshToken> {
+    return this.db.collection('refresh_tokens')
+  }
   get Account(): Collection<Account> {
     return this.db.collection('Account')
   }

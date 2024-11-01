@@ -2,8 +2,12 @@ export default function parseBoolean(value: any): boolean {
   if (typeof value === 'boolean') {
     return value
   }
-  if (typeof value === 'string') {
-    return value.toLowerCase() === 'true'
+  if (typeof value === 'number') {
+    return value === 1
   }
-  return false // Hoặc có thể ném lỗi nếu không phải kiểu boolean hợp lệ
+  if (typeof value === 'string') {
+    const lowerValue = value.toLowerCase()
+    return lowerValue === 'true' || lowerValue === '0'
+  }
+  return false
 }

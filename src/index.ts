@@ -59,7 +59,15 @@ app.use(express.static(path.join(__dirname, 'public')))
 // Routes
 Routes(app)
 ApiRoutes(app)
-app.get('*', (req: Request, res: Response) => {
+// Route trang chủ
+app.get('/', (req: Request, res: Response) => {
+  res.render('pages/home', {
+    pageTitle: 'Trang chủ'
+  })
+})
+
+// Route 404
+app.use((req: Request, res: Response) => {
   res.status(404).render('pages/error/404', {
     pageTitle: '404 Not Found'
   })

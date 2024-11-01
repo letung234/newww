@@ -25,7 +25,6 @@ export const ApiDeleteSalaryFilterController = async (
   res: Response
 ) => {
   const { ids } = req.body
-  console.log(ids)
 
   const deletedCount = await salaryService.deleteSalaries(ids)
 
@@ -50,7 +49,6 @@ export const ApieditSalaryFilterController = async (req: Request<any, any, Salar
   const salaryId = req.params.id
   const { ten, loai, mo_ta, is_active, tai_khoan_ke_toan } = req.body
   const result = await salaryService.updateSalary(salaryId, { ten, loai, mo_ta, is_active, tai_khoan_ke_toan })
-
   if (result.modifiedCount === 0) {
     return res.status(404).json({
       message: SALARY_MESSAGES.SALARY_NOT_FOUND

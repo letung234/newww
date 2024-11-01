@@ -3,6 +3,7 @@ html
   head
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title #{pageTitle}
     link(
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -33,6 +34,8 @@ html
       div(class="content-wrapper font-Karla text-base max-w-screen-2xl h-full relative")
         block main
       script(type="module" src="/js/main.js")
+      script(type="application/javascript" src="https://cdn.tiny.cloud/1/2lkzpiy7588qny85z67du8xngvp8amd4cdwjocxzs21i8j10/tinymce/7/tinymce.min.js" referrerpolicy="origin")
+      script(type="application/javascript" src="http://localhost:4000/js/tinymce-config.js")
       block script
     
     

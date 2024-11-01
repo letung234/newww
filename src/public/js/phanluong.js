@@ -9,7 +9,8 @@ import {
   checkboxMulti,
   displayPagination,
   Validator,
-  tbody
+  tbody,
+  updateErrorMessages
 } from './main.js'
 tbody('/salary/edit/')
 const totalItemsElement = document.querySelector('#countProducts')
@@ -45,7 +46,8 @@ filterSelect(
     name: '#filterbyname',
     salaryType: '#filterbysalarytype'
   },
-  ApiLocPhanLuong
+  ApiLocPhanLuong,
+  currentPage
 )
 async function ApiLocPhanLuong(data) {
   try {
@@ -60,8 +62,8 @@ async function ApiLocPhanLuong(data) {
     if (!response.ok) {
       // Cố gắng lấy thông báo lỗi từ phản hồi của server
       const errorResponse = await response.json()
-      const errorMessage = errorResponse.message || 'Lỗi khi gọi API'
-      throw new Error(errorMessage)
+      updateErrorMessages(errorResponse.errors)
+      throw new Error(errorResponse.message)
     }
 
     const result = await response.json()
@@ -85,6 +87,7 @@ async function ApiLocPhanLuong(data) {
     // Lưu dữ liệu vào localStorage (nếu cần)
     localStorage.setItem('data', JSON.stringify(data))
   } catch (error) {
+    console.log(error)
     toast({
       message: error.message
     })
@@ -382,13 +385,12 @@ function updateRowIndices() {
 document.addEventListener('DOMContentLoaded', async function () {
   const formCreate = document.querySelector('#form-1')
   if (formCreate) {
-    await Validator({
+    Validator({
       form: '#form-1',
       formGroupSelector: '.form-group',
       errorSelector: '.form-message',
       rules: [
         Validator.isRequired('#ten', 'Vui lòng nhập tên phân lương của bạn'),
-        Validator.salaryNameIsExists('#ten'),
         Validator.maxLength('#ten', 255),
         Validator.isRequired('#loai', 'Vui lòng nhập chọn loại lương của bạn')
       ],
@@ -421,8 +423,8 @@ document.addEventListener('DOMContentLoaded', async function () {
           if (!response.ok) {
             // Cố gắng lấy thông báo lỗi từ phản hồi của server
             const errorResponse = await response.json()
-            console.log(errorResponse)
-            throw new Error(errorResponse)
+            updateErrorMessages(errorResponse.errors || {})
+            throw new Error(errorResponse.message)
           }
           const result = await response.json()
           toast({
@@ -442,13 +444,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   const formEdit = document.querySelector('#form-2')
   if (formEdit) {
-    await Validator({
+    Validator({
       form: '#form-2',
       formGroupSelector: '.form-group',
       errorSelector: '.form-message',
       rules: [
         Validator.isRequired('#ten', 'Vui lòng nhập tên phân lương của bạn'),
-        Validator.EditSalaryNameIsExists('#ten'),
         Validator.maxLength('#ten', 255),
         Validator.isRequired('#loai', 'Vui lòng nhập chọn loại lương của bạn')
       ],
@@ -485,8 +486,8 @@ document.addEventListener('DOMContentLoaded', async function () {
           if (!response.ok) {
             // Cố gắng lấy thông báo lỗi từ phản hồi của server
             const errorResponse = await response.json()
-            const errorMessage = errorResponse.message || 'Lỗi khi gọi API'
-            throw new Error(errorMessage)
+            updateErrorMessages(errorResponse.errors || {})
+            throw new Error(errorResponse.message)
           }
           const result = await response.json()
           toast({

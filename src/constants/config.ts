@@ -25,7 +25,12 @@ export const envConfig = {
     cloudName: process.env.CLOUD_NAME as string,
     apiKey: process.env.API_KEY as string,
     apiSecret: process.env.API_SECRET as string
-  }
+  },
+  passwordSecret: process.env.PASSWORD_SECRET as string,
+  jwtSecretAccessToken: process.env.JWT_SECRET_ACCESS_TOKEN as string,
+  jwtSecretRefreshToken: process.env.JWT_SECRET_REFRESH_TOKEN as string,
+  refreshTokenExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN as string,
+  accessTokenExpiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN as string
 }
 
 const requiredEnvVars = [
@@ -33,9 +38,14 @@ const requiredEnvVars = [
   'DB_USERNAME',
   'DB_PASSWORD',
   'KEY_SESSION_COOKIE',
+  'PASSWORD_SECRET',
   'CLOUD_NAME',
   'API_KEY',
-  'API_SECRET'
+  'API_SECRET',
+  'JWT_SECRET_ACCESS_TOKEN',
+  'JWT_SECRET_REFRESH_TOKEN',
+  'REFRESH_TOKEN_EXPIRES_IN',
+  'ACCESS_TOKEN_EXPIRES_IN'
 ]
 requiredEnvVars.forEach((key) => {
   if (!process.env[key]) {
