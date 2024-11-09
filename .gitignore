@@ -1,5 +1,1 @@
 node_modules/
-dist/
-.env.staging
-.env.production
-/uploads

@@ -9,6 +9,7 @@ export const upload = async (req: Request, res: Response) => {
 
 export const deleteImage = async (req: Request, res: Response) => {
   const id = req.params.id
+  console.log(id)
   const result = await mediasService.deleteImage(id)
   return res.status(HTTP_STATUS.OK).json(result)
 }

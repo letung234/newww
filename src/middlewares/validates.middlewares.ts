@@ -77,10 +77,13 @@ export const UpdateSalaryValidator = validate(
       },
       tai_khoan_ke_toan: {
         custom: {
-          options: (value) => {
+          options: async (value) => {
             const seen = new Set()
             for (const account of value) {
               const key = `${account.id_congty}-${account.id_ke_toan}`
+              const cty = await databaseService.Company.findOne({ _id: new ObjectId(account.id_congty) })
+              const kt = await databaseService.Account.findOne({ _id: new ObjectId(account.id_ke_toan) })
+              if (!cty || !kt) throw new Error(`Could not find company and account`)
               if (seen.has(key)) {
                 throw new Error(SALARY_MESSAGES.DUPLICATE_ACCOUNT_COMPANY_PAIR) // 'Có cặp ID công ty và ID kế toán bị trùng'
               }
@@ -155,10 +158,13 @@ export const createSalaryValidator = validate(
       },
       tai_khoan_ke_toan: {
         custom: {
-          options: (value) => {
+          options: async (value) => {
             const seen = new Set()
             for (const account of value) {
               const key = `${account.id_congty}-${account.id_ke_toan}`
+              const cty = await databaseService.Company.findOne({ _id: new ObjectId(account.id_congty) })
+              const kt = await databaseService.Account.findOne({ _id: new ObjectId(account.id_ke_toan) })
+              if (!cty || !kt) throw new Error(`Could not find company and account`)
               if (seen.has(key)) {
                 throw new Error(SALARY_MESSAGES.DUPLICATE_ACCOUNT_COMPANY_PAIR) // 'Có cặp ID công ty và ID kế toán bị trùng.'
               }
@@ -208,7 +214,7 @@ export const loginValidator = validate(
       custom: {
         options: async (value, { req }) => {
           const user = await databaseService.User.findOne({
-            email: value,
+            email: req.body.email,
             password: hashPassword(req.body.password),
             is_active: true
           })
@@ -553,9 +559,10 @@ export const createSalaryStructureValidator = validate(
         errorMessage: SALARY_STRUCTURE_MESSAGE.INCOME_IS_ARRAY
       },
       custom: {
-        options: (value) => {
+        options: async (value) => {
           for (const item of value) {
-            console.log(value)
+            const id = await databaseService.SalaryPortion.findOne({ _id: new ObjectId(item.id_phan_luong) })
+            if (!id) throw new Error(`Salary not found!!!`)
             if (item.so_tien < 0) {
               throw new Error(SALARY_STRUCTURE_MESSAGE.INVALID_AMOUNT)
             }
@@ -569,8 +576,10 @@ export const createSalaryStructureValidator = validate(
         errorMessage: SALARY_STRUCTURE_MESSAGE.DEDUCTION_IS_ARRAY
       },
       custom: {
-        options: (value) => {
+        options: async (value) => {
           for (const item of value) {
+            const id = await databaseService.SalaryPortion.findOne({ _id: new ObjectId(item.id_phan_luong) })
+            if (!id) throw new Error(`Salary not found!!!`)
             if (item.so_tien < 0) {
               throw new Error(SALARY_STRUCTURE_MESSAGE.INVALID_AMOUNT)
             }
@@ -587,7 +596,10 @@ export const createSalaryStructureValidator = validate(
         errorMessage: 'Hình thức chi trả phải là một đối tượng.'
       },
       custom: {
-        options: (value) => {
+        options: async (value) => {
+          const ht = await databaseService.FormOfPayment.findOne({ _id: new ObjectId(value.id_hinh_thuc) })
+          const tk = await databaseService.PayMentAccount.findOne({ _id: new ObjectId(value.id_tai_khoan_chi_tra) })
+          if (!ht || !tk) throw new Error('Không thể tìm thấy id hình thưc hoặc id tài khoản chi trả!!!')
           if (!value.id_hinh_thuc || !value.id_tai_khoan_chi_tra) {
             throw new Error(SALARY_STRUCTURE_MESSAGE.PAYMENT_METHOD_IS_REQUIRED)
           }
@@ -672,8 +684,10 @@ export const updateSalaryStructureValidator = validate(
       },
       optional: true,
       custom: {
-        options: (value) => {
+        options: async (value) => {
           for (const item of value) {
+            const id = await databaseService.SalaryPortion.findOne({ _id: new ObjectId(item.id_phan_luong) })
+            if (!id) throw new Error(`Salary not found!!!`)
             if (item.so_tien < 0) {
               throw new Error(SALARY_STRUCTURE_MESSAGE.INVALID_AMOUNT)
             }
@@ -688,8 +702,10 @@ export const updateSalaryStructureValidator = validate(
       },
       optional: true,
       custom: {
-        options: (value) => {
+        options: async (value) => {
           for (const item of value) {
+            const id = await databaseService.SalaryPortion.findOne({ _id: new ObjectId(item.id_phan_luong) })
+            if (!id) throw new Error(`Salary not found!!!`)
             if (item.so_tien < 0) {
               throw new Error(SALARY_STRUCTURE_MESSAGE.INVALID_AMOUNT)
             }
@@ -704,7 +720,10 @@ export const updateSalaryStructureValidator = validate(
       },
       optional: true,
       custom: {
-        options: (value) => {
+        options: async (value) => {
+          const ht = await databaseService.FormOfPayment.findOne({ _id: new ObjectId(value.id_hinh_thuc) })
+          const tk = await databaseService.PayMentAccount.findOne({ _id: new ObjectId(value.id_tai_khoan_chi_tra) })
+          if (!ht || !tk) throw new Error('Không thể tìm thấy id hình thưc hoặc id tài khoản chi trả!!!')
           if (!value.id_hinh_thuc || !value.id_tai_khoan_chi_tra) {
             throw new Error(SALARY_STRUCTURE_MESSAGE.PAYMENT_METHOD_IS_REQUIRED)
           }

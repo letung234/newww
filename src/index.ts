@@ -13,6 +13,7 @@ import { PATH_ADMIN } from '~/constants/dir'
 import { defaultErrorHandler } from '~/middlewares/error.middleware'
 import { envConfig } from '~/constants/config'
 import { initFolder } from './utils/file'
+import authenticateToken from '~/middlewares/authenticateToken'
 initFolder()
 // Kết nối với cơ sở dữ liệu
 databaseService.connect()
@@ -60,7 +61,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 Routes(app)
 ApiRoutes(app)
 // Route trang chủ
-app.get('/', (req: Request, res: Response) => {
+app.get('/', authenticateToken, (req: Request, res: Response) => {
   res.render('pages/home', {
     pageTitle: 'Trang chủ'
   })

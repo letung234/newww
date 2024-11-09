@@ -67,7 +67,7 @@ class DatabaseService {
     const existingIndexes = await this.SalaryPortion.indexes()
     const existingIndexNames = existingIndexes.map((index) => index.name)
 
-    // Tạo index nếu chưa tồn tại
+    // Tạo index cho SalaryPortion nếu chưa tồn tại
     if (!existingIndexNames.includes('index_ten')) {
       await this.SalaryPortion.createIndex({ ten: 1 }, { name: 'index_ten' })
     }
@@ -90,6 +90,34 @@ class DatabaseService {
 
     if (!existingIndexNames.includes('index_id_ten')) {
       await this.SalaryPortion.createIndex({ _id: 1, ten: 1 }, { name: 'index_id_ten' })
+    }
+
+    // Tạo index cho refreshTokens nếu chưa tồn tại
+    const existingRefreshIndexes = await this.refreshTokens.indexes()
+    const existingRefreshIndexNames = existingRefreshIndexes.map((index) => index.name)
+
+    if (!existingRefreshIndexNames.includes('index_token')) {
+      await this.refreshTokens.createIndex({ token: 1 }, { name: 'index_token' })
+    }
+
+    // Tạo index cho SalaryStructure nếu chưa tồn tại
+    const existingSalaryStructureIndexes = await this.SalaryStructure.indexes()
+    const existingSalaryStructureIndexNames = existingSalaryStructureIndexes.map((index) => index.name)
+
+    if (!existingSalaryStructureIndexNames.includes('index_salarystructure_ten')) {
+      await this.SalaryStructure.createIndex({ ten: 1 }, { name: 'index_salarystructure_ten' })
+    }
+
+    if (!existingSalaryStructureIndexNames.includes('index_salarystructure_is_active')) {
+      await this.SalaryStructure.createIndex({ is_active: 1 }, { name: 'index_salarystructure_is_active' })
+    }
+
+    if (!existingSalaryStructureIndexNames.includes('index_update_at')) {
+      await this.SalaryStructure.createIndex({ updated_at: 1 }, { name: 'index_update_at' })
+    }
+
+    if (!existingSalaryStructureIndexNames.includes('index_salaryStructure_deleted')) {
+      await this.SalaryStructure.createIndex({ deleted: 1 }, { name: 'index_salaryStructure_deleted' })
     }
 
     console.log('Indexes created successfully')

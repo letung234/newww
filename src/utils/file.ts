@@ -15,6 +15,7 @@ export const initFolder = () => {
 }
 
 export const handleUploadImage = async (req: Request) => {
+  console.log(1)
   const formidable = (await import('formidable')).default
   const form = formidable({
     uploadDir: UPLOAD_IMAGE_TEMP_DIR,

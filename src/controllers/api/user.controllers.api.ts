@@ -5,12 +5,20 @@ import HTTP_STATUS from '~/constants/httpStatus'
 import { hashPassword } from '~/utils/crypto'
 import User from '~/models/schemas/user.model'
 import { USER_MESSAGES } from '~/constants/messages'
+import databaseService from '~/services/database.service'
 export const PostCreateUsers = async (req: Request<any, any, UserPayload, any>, res: Response) => {
   const data = { ...req.body }
   data.password = hashPassword(data.password)
   const result = await UsersService.Register(data)
   console.log(result)
   return res.status(HTTP_STATUS.CREATED).json({ success: true })
+}
+export const PostLogoutUser = async (req: Request<any, any, UserPayload, any>, res: Response) => {
+  res.clearCookie('access_token')
+  res.clearCookie('refresh_token')
+  const refreshToken = req.cookies?.refresh_token
+  await databaseService.refreshTokens.deleteOne({ token: refreshToken })
+  return res.status(HTTP_STATUS.OK).json({ success: true })
 }
 
 export const PatchEditUsers = async (req: Request<any, any, UserPayload, any>, res: Response) => {
