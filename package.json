@@ -7,7 +7,7 @@
     "dev:stag": "NODE_ENV=staging npx nodemon",
     "dev:prod": "NODE_ENV=production npx nodemon",
     "build": "rimraf ./dist && tsc && tsc-alias",
-    "start:dev": "cross-env NODE_ENV=development node dist/index.js",
+    "start": "cross-env NODE_ENV=development node dist/index.js",
     "start:stag": "cross-env NODE_ENV=staging node dist/index.js",
     "start:prod": "cross-env NODE_ENV=production node dist/index.js",
     "lint": "eslint .",
