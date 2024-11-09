@@ -1,5 +1,4 @@
-import { copy, ensureDir } from 'fs-extra'
-
+const fs = require("fs-extra");
 const listFolderCopy = [
   {
     sourceDirectory: 'src/views',
@@ -17,9 +16,9 @@ const listFolderCopy = [
 
 // Kiểm tra và tạo thư mục nếu không tồn tại
 listFolderCopy.forEach((item) => {
-  ensureDir(item.sourceDirectory)
+  fs.ensureDir(item.sourceDirectory)
     .then(() => {
-      copy(item.sourceDirectory, item.targetDirectory, (err) => {
+      fs.copy(item.sourceDirectory, item.targetDirectory, (err) => {
         if (err) {
           console.error(`Lỗi sao chép thư mục ${item.sourceDirectory}:`, err)
         } else {
