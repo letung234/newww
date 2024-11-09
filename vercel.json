@@ -6,6 +6,13 @@
       "dest": "/dist/index.js"
     }
   ],
+  "builds": [
+      {
+        "src": "dist/index.js",
+        "use": "@vercel/node",
+        "config": { "includeFiles": ["dist/**"] }
+      }
+    ],
   "env": {
     "DB_NAME": "database",
     "DB_USERNAME": "letung1227",
