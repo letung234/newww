@@ -1,27 +1,33 @@
-import { copy } from 'fs-extra'
+import { copy, ensureDir } from 'fs-extra'
 
-const listFolderCopy = [{
+const listFolderCopy = [
+  {
     sourceDirectory: 'src/views',
     targetDirectory: 'dist/views'
   },
   {
     sourceDirectory: 'src/public',
     targetDirectory: 'dist/public'
-  }, {
-    sourceDirectory: 'src/uploads',
+  },
+  {
+    sourceDirectory: 'src/uploads', // Đảm bảo thư mục src/uploads tồn tại
     targetDirectory: 'dist/uploads'
   }
 ]
 
-async function copyFolders() {
-  for (const item of listFolderCopy) {
-    try {
-      await copy(item.sourceDirectory, item.targetDirectory)
-      console.log(`Sao chép thành công thư mục ${item.sourceDirectory}`)
-    } catch (err) {
-      console.error(`Lỗi sao chép thư mục ${item.sourceDirectory}:`, err)
-    }
-  }
-}
-
-copyFolders()
+// Kiểm tra và tạo thư mục nếu không tồn tại
+listFolderCopy.forEach((item) => {
+  ensureDir(item.sourceDirectory)
+    .then(() => {
+      copy(item.sourceDirectory, item.targetDirectory, (err) => {
+        if (err) {
+          console.error(`Lỗi sao chép thư mục ${item.sourceDirectory}:`, err)
+        } else {
+          console.log(`Sao chép thành công thư mục ${item.sourceDirectory}`)
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(`Lỗi khi kiểm tra thư mục ${item.sourceDirectory}:`, err)
+    })
+})
